@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/flutter_html.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sama/BloC/Message/MessageBloc.dart';
@@ -122,8 +122,104 @@ class _MessageShowState extends State<MessageShowIncomming> {
                     //   ).toString(),
                     //   javascriptMode: JavascriptMode.unrestricted,
                     // ),
-                    Text(state.message.text),
+                    Html(data: state.message.text),
               ),
+              (state.message.mainAttach != null &&
+                      state.message.attaches.length > 0
+                  ? Container(
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.white,
+                      // padding: EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey[400])),
+                            child: Row(
+                              children: <Widget>[
+                                Icon(Icons.attach_file),
+                                Text(
+                                  "پیوست اصل پیام",
+                                  style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 4,
+                          ),
+                          new ConstrainedBox(
+                            constraints: new BoxConstraints(
+                              minHeight: 30.0,
+                              maxHeight: (state.message.mainAttach.length > 1
+                                  ? 200.0
+                                  : 60),
+                            ),
+                            child: ListView.builder(
+                                itemCount: state.message.mainAttach.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    leading: Icon(
+                                      Icons.insert_drive_file,
+                                      size: 35,
+                                    ),
+                                    title: Align(
+                                      child: new Text(
+                                          state.message.mainAttach[index]
+                                              .uploadName,
+                                          style: TextStyle(fontSize: 13)),
+                                      alignment: Alignment(1.2, 0),
+                                    ),
+                                    onTap: () async {
+                                      if (await MCheckPermision
+                                          .requestPermissions(
+                                              Permission.storage)) {
+                                        Downloader d = new Downloader();
+                                        d.download(
+                                            state.message.mainAttach[index].url,
+                                            context);
+                                      } else {
+                                        MSnackBar.ErrorWithText(context,
+                                            "لطفا دسرتسی لازم را به برنامه بدهید");
+                                      }
+                                    },
+                                  );
+                                }),
+                            // ListView(
+                            //   children: [
+                            //     Builder(
+                            //         builder: (context) => ListTile(
+                            //               onTap: () async {
+                            //                 if (await MCheckPermision
+                            //                     .requestPermissions(
+                            //                         Permission.storage)) {
+                            //                   Downloader d = new Downloader();
+                            //                   d.download(
+                            //                       "http://lot.services/blog/files/DSCF0277.jpg",
+                            //                       context);
+                            //                 } else {
+                            //                   MSnackBar.ErrorWithText(context,
+                            //                       "لطفا دسرتسی لازم را به برنامه بدهید");
+                            //                 }
+                            //               },
+                            //               leading: Icon(Icons.ac_unit),
+                            //               title: Text("mohammad"),
+                            //             ))
+                            //   ],
+                            // ),
+                          )
+                        ],
+                      ),
+                    )
+                  : Container(
+                      width: 0,
+                      height: 0,
+                    )),
               (state.message.attaches != null &&
                       state.message.attaches.length > 0
                   ? Container(
@@ -141,7 +237,7 @@ class _MessageShowState extends State<MessageShowIncomming> {
                               children: <Widget>[
                                 Icon(Icons.attach_file),
                                 Text(
-                                  "پیوست",
+                                  "پیوست جدید",
                                   style: TextStyle(
                                       fontSize: 15.0,
                                       color: Colors.black,
@@ -164,13 +260,16 @@ class _MessageShowState extends State<MessageShowIncomming> {
                                 itemCount: state.message.attaches.length,
                                 itemBuilder: (context, index) {
                                   return ListTile(
-                                    leading: Icon(Icons.insert_drive_file),
+                                    leading: Icon(
+                                      Icons.insert_drive_file,
+                                      size: 35,
+                                    ),
                                     title: Align(
                                       child: new Text(
                                           state.message.attaches[index]
                                               .uploadName,
                                           style: TextStyle(fontSize: 13)),
-                                      alignment: Alignment(1.4, 0),
+                                      alignment: Alignment(1.2, 0),
                                     ),
                                     onTap: () async {
                                       if (await MCheckPermision

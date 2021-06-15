@@ -58,14 +58,14 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
           currentState is MessageStateForward ||
           currentState is MessageStateReply) {
         yield MessageStateUninitialized();
-        final messages =
-            await messageRepository.fetchSendMessage(page: event.page);
+        final messages = await messageRepository.fetchSendMessage(
+            page: event.page, vm: event.vm);
         yield MessageStateLoaded(
             messages: messages, hasReachedMax: false, messageType: 1);
       }
       if (currentState is MessageStateLoaded) {
-        final messages =
-            await messageRepository.fetchSendMessage(page: event.page);
+        final messages = await messageRepository.fetchSendMessage(
+            page: event.page, vm: event.vm);
 
         if (currentState.messageType == 0 || event.refreshList == true) {
           yield MessageStateLoaded(
@@ -98,7 +98,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
           yield MessageStateLoaded(
               messages: messages, hasReachedMax: false, messageType: 0);
         }
-        if (currentState is MessageStateLoaded ) {
+        if (currentState is MessageStateLoaded) {
           final messages = await messageRepository.fetchIncommingMessage(
               page: event.page, vm: event.vm);
           if (currentState.messageType == 1 || event.refreshList == true) {

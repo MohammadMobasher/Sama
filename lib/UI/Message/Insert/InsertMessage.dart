@@ -5,7 +5,7 @@ import 'package:sama/BloC/Message/MessageBloc.dart';
 import 'package:sama/BloC/Message/MessageEvent.dart';
 import 'package:sama/Model/User.dart';
 import 'package:sama/Model/ViewModel/MessageInsertViewModel.dart';
-
+import 'package:file_picker/file_picker.dart';
 import 'package:sama/SamaBase/Constants.dart';
 import 'package:sama/UI/Global/SButton.dart';
 import 'package:sama/UI/Global/SUserAutoComplete.dart';
@@ -23,6 +23,7 @@ class _InsertMessageState extends State<InsertMessage> {
   final key = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   MessageBloc _messageBloc;
+  List<PlatformFile> _files = new List<PlatformFile>();
   final _titleController = TextEditingController();
   final _textController = TextEditingController();
   List<User> _recipientUsers = new List<User>();
@@ -118,7 +119,6 @@ class _InsertMessageState extends State<InsertMessage> {
                   controller: this._textController,
                   minLines: 10,
                   maxLines: 20,
-                  keyboardType: TextInputType.text,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -134,6 +134,44 @@ class _InsertMessageState extends State<InsertMessage> {
                       )),
                 ),
               )),
+              RaisedButton(
+                onPressed: () async {
+                  FilePickerResult result = await FilePicker.platform.pickFiles(
+                    allowMultiple: false,
+                  );
+                  setState(() {
+                    if (result != null) {
+                      _files = result.files;
+                    } else {
+                      _files = null;
+                    }
+                  });
+                },
+                child: const Icon(Icons.attach_file),
+              ),
+              new ConstrainedBox(
+                  constraints: new BoxConstraints(
+                    minHeight: 30.0,
+                    maxHeight: (_files.length > 1 ? 200.0 : 50),
+                  ),
+                  child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: _files.length,
+                    itemBuilder: (BuildContext ctxt, int index) {
+                      return ListTile(
+                        leading: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(60),
+                          ),
+                          child: Center(child: Text(index.toString())),
+                        ),
+                        title: Text(_files[index].name),
+                      );
+                    },
+                  ))
             ],
           ),
         )),
@@ -203,7 +241,10 @@ class _InsertMessageState extends State<InsertMessage> {
               text: this._textController.text,
               recipients: recipientIds,
               ccRecipients: cc_recipientIds,
-              bccRecipients: bbc_recipientIds)));
+              bccRecipients: bbc_recipientIds,
+              attachPath: ((this._files != null && this._files.length > 0)
+                  ? this._files.first.path
+                  : ""))));
 
       Navigator.pop(context);
     }

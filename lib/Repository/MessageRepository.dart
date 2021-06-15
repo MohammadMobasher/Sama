@@ -6,6 +6,7 @@ import 'package:sama/Model/ViewModel/MessageReplyViewModel.dart';
 import 'package:sama/Model/ViewModel/MessageSearchViewModel.dart';
 import 'package:sama/SamaBase/Network/ApiProvider.dart';
 import 'package:sama/SamaBase/Network/NetworkRespons.dart';
+import 'package:sama/Utilities/MPref.dart';
 
 class MeeageRepository {
   final ApiProvider apiProvider;
@@ -13,31 +14,65 @@ class MeeageRepository {
   MeeageRepository({@required this.apiProvider}) : assert(apiProvider != null);
 
   Future<bool> Forward(MessageForwardViewModel vm) async {
-    String url = "mail/" + vm.messageId.toString() + "/set-bookmark";
-    var result = await apiProvider.post(url, body: vm.toJson());
-    if (result.status != Status.ERROR) {
-      return true;
+    String url = "mail/" + vm.messageId.toString() + "/forward";
+    bool result;
+    if (vm.attachPath.isNotEmpty) {
+      result = await apiProvider.postForwardWithFile(
+          url: url, path: vm.attachPath, vm: vm);
+      if (result) return true;
+      return false;
+    } else {
+      NetworkResponse result = await apiProvider.post(url, body: vm.toJson());
+      if (result.status != Status.ERROR) {
+        return true;
+      }
+      return false;
     }
-    return false;
+
+    // var result = await apiProvider.post(url, body: vm.toJson());
+    // if (result.status != Status.ERROR) {
+    //   return true;
+    // }
+    // return false;
   }
 
   Future<bool> Reply(MessageReplyViewModel vm) async {
     String url = "mail/" + vm.messageId.toString() + "/reply";
-    var result = await apiProvider.post(url, body: vm.toJson());
-    if (result.status != Status.ERROR) {
-      return true;
+    bool result;
+    if (vm.attachPath.isNotEmpty) {
+      result = await apiProvider.postReplyWithFile(
+          url: url, path: vm.attachPath, vm: vm);
+      if (result) return true;
+      return false;
+    } else {
+      NetworkResponse result = await apiProvider.post(url, body: vm.toJson());
+      if (result.status != Status.ERROR) {
+        return true;
+      }
+      return false;
     }
-    return false;
+    // var result = await apiProvider.post(url, body: vm.toJson());
+    // if (result.status != Status.ERROR) {
+    //   return true;
+    // }
+    // return false;
   }
 
   Future<bool> Insert(MessageInsertViewModel vm) async {
     String url = "mail/compose";
-
-    var result = await apiProvider.post(url, body: vm.toJson());
-    if (result.status != Status.ERROR) {
-      return true;
+    bool result;
+    if (vm.attachPath.isNotEmpty) {
+      result =
+          await apiProvider.postWithFile(url: url, path: vm.attachPath, vm: vm);
+      if (result) return true;
+      return false;
+    } else {
+      NetworkResponse result = await apiProvider.post(url, body: vm.toJson());
+      if (result.status != Status.ERROR) {
+        return true;
+      }
+      return false;
     }
-    return false;
   }
 
   Future<Message> getItem(int messageId, {messageType = 0}) async {
@@ -72,18 +107,20 @@ class MeeageRepository {
   }
 
   Future<int> getNumberOfNewMessage() async {
-    var messageId =
-        // MPref.getString("LastMessageId");
-        "28183";
+    // var messageId =
+    //     MPref.getString("LastMessageId");
+    //     // "28183";
     // MPref.getString("LastMessageId");
-    if (messageId != null && messageId.isNotEmpty) {
-      String url = "mail/new-messages-count?last_id=$messageId";
-      var result = await apiProvider.get(url);
-      if (result.status != Status.ERROR) {
-        return 10; //result.data["count"];
-      }
+    // if (messageId != null && messageId.isNotEmpty) {
+    // return 1;
+
+    String url = "mail/new-messages-count";
+    var result = await apiProvider.get(url);
+    if (result.status != Status.ERROR) {
+      return result.data["count"];
     }
-    return 11;
+    // }
+    // return 11;
   }
 
   Future<List<Message>> fetchSendMessage(

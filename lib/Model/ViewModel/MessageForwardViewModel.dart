@@ -6,13 +6,15 @@ class MessageForwardViewModel {
   List<int> recipients;
   List<int> ccRecipients;
   List<int> bccRecipients;
+  String attachPath;
 
   MessageForwardViewModel(
       {this.messageId,
       this.text,
       this.recipients,
       this.ccRecipients,
-      this.bccRecipients});
+      this.bccRecipients,
+      this.attachPath});
 
   MessageForwardViewModel.fromJson(Map<String, dynamic> json) {
     text = json['text'];

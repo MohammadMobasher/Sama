@@ -2,7 +2,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:background_fetch/background_fetch.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:open_file/open_file.dart';
+import 'package:open_file/open_file.dart';
 import 'package:sama/BloC/Login/LoginEvent.dart';
 import 'package:sama/BloC/Message/MessageBloc.dart';
 import 'package:sama/BloC/Pagination/PaginationBloc.dart';
@@ -29,15 +29,15 @@ import 'BloC/Pagination/PaginationEvent.dart';
 import 'BloC/User/UserBloc.dart';
 
 void backgroundFetchHeadlessTask(String taskId) async {
-  await MPref.getInstance();
   BackgroundFetch.scheduleTask(TaskConfig(
       taskId: "task1",
-      delay: 10000,
+      delay: 50000,
       periodic: true,
       forceAlarmManager: true,
       stopOnTerminate: false,
       enableHeadless: true));
-  BackgroundFetch.finish(taskId);
+
+  await MPref.getInstance();
   if (MPref.getString("AccessToken") != "") {
     var m = MeeageRepository(apiProvider: ApiProvider());
     try {
@@ -75,76 +75,6 @@ void main() async {
         ledColor: Colors.red)
   ]);
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  // await AndroidAlarmManager.periodic(
-  //   const Duration(minutes: 1),
-  //   1,
-  //   printHello2,
-  //   wakeup: true,
-  // );
-}
-
-void printHello2() async {
-  await MPref.getInstance();
-
-  if (MPref.getString("AccessToken") != "") {
-    var m = MeeageRepository(apiProvider: ApiProvider());
-    var numNewItem = await m.getNumberOfNewMessage();
-    if (numNewItem != 0) {
-      AwesomeNotifications().createNotification(
-          content: NotificationContent(
-              id: 10,
-              channelKey: 'basic_channel',
-              title: 'پیام جدید',
-              body: 'شما $numNewItem پیام جدید دارید.'));
-    }
-  }
-}
-
-// FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-
-// void printHello() async {
-//   await MPref.getInstance();
-//   if (MPref.getString("AccessToken") != "") {
-//     var m = MeeageRepository(apiProvider: ApiProvider());
-//     var numNewItem = await m.getNumberOfNewMessage();
-//     if (numNewItem != 0) {
-//       // flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-//       // final android = AndroidInitializationSettings('@mipmap/ic_launcher');
-//       // final iOS = IOSInitializationSettings();
-//       // final initSettings = InitializationSettings(android, iOS);
-
-//       // flutterLocalNotificationsPlugin.initialize(initSettings,
-//       //     onSelectNotification: _onSelectNotification);
-//       // flutterLocalNotificationsPlugin.initialize(initSettings,
-//       //     onSelectNotification: (String payload) async {
-//       //   print("this is a message from mohammad mobasher");
-//       // });
-//       await _showNotification(numNewItem);
-//     }
-//   }
-// }
-
-// Future<void> _showNotification(int num) async {
-//   final android = AndroidNotificationDetails(
-//       'channel id', 'channel name', 'channel description',
-//       priority: Priority.High, importance: Importance.Max);
-//   final iOS = IOSNotificationDetails();
-//   final platform = NotificationDetails(android, iOS);
-
-//   await flutterLocalNotificationsPlugin.show(
-//       1, // notification id
-//       'پیام جدید',
-//       'شما $num پیام جدید دارید.',
-//       platform,
-//       payload: "json");
-// }
-
-Future<void> _onSelectNotification(String json) async {
-  // setState(() {
-  // MessageBloc(messageRepository: MeeageRepository(apiProvider: ApiProvider()))
-  //     .add(MessageEventFetchIncomming(page: 1, vm: null, refreshList: true));
-  print("this is a message from mohammad mobasher");
-  // });
 }
 
 class MApp extends StatefulWidget {
@@ -167,6 +97,7 @@ class MyApp extends State<MApp> {
     // Configure BackgroundFetch.
     BackgroundFetch.configure(
             BackgroundFetchConfig(
+                startOnBoot: true,
                 minimumFetchInterval: 1,
                 forceAlarmManager: true,
                 stopOnTerminate: false,
@@ -185,7 +116,7 @@ class MyApp extends State<MApp> {
 
     BackgroundFetch.scheduleTask(TaskConfig(
         taskId: "task1",
-        delay: 10000,
+        delay: 1,
         periodic: true,
         forceAlarmManager: true,
         stopOnTerminate: false,
@@ -198,7 +129,7 @@ class MyApp extends State<MApp> {
         await MPref.getInstance();
         BackgroundFetch.scheduleTask(TaskConfig(
             taskId: "task1",
-            delay: 10000,
+            delay: 50000,
             periodic: false,
             forceAlarmManager: true,
             stopOnTerminate: false,
@@ -219,45 +150,8 @@ class MyApp extends State<MApp> {
         }
 
         break;
-      case "task2":
-        await MPref.getInstance();
-        BackgroundFetch.scheduleTask(TaskConfig(
-            taskId: "task2",
-            delay: 5000,
-            periodic: true,
-            forceAlarmManager: true,
-            stopOnTerminate: false,
-            enableHeadless: true));
-        if (MPref.getString("AccessToken") != "") {
-          var m = MeeageRepository(apiProvider: ApiProvider());
-          try {
-            var numNewItem = await m.getNumberOfNewMessage();
-            if (numNewItem != 0) {
-              AwesomeNotifications().createNotification(
-                  content: NotificationContent(
-                      id: 10,
-                      channelKey: 'basic_channel',
-                      title: 'پیام جدید',
-                      body: 'شما $numNewItem پیام جدید دارید.'));
-            }
-          } catch (_) {}
-        }
-
-        break;
-    }
-    if (taskId == "com.transistorsoft.customtask") {
-      // Schedule a one-shot task when fetch event received (for testing).
-      // BackgroundFetch.scheduleTask(TaskConfig(
-      //     taskId: "com.transistorsoft.customtask",
-      //     delay: 5000,
-      //     periodic: false,
-      //     forceAlarmManager: true,
-      //     stopOnTerminate: false,
-      //     enableHeadless: true));
     }
 
-    // IMPORTANT:  You must signal completion of your fetch task or the OS can punish your app
-    // for taking too long in the background.
     BackgroundFetch.finish(taskId);
   }
 
@@ -342,7 +236,7 @@ class MyApp extends State<MApp> {
     AwesomeNotifications().actionStream.listen((receivedNotification) {
       // Navigator.of(c2).pop();
       if (receivedNotification.channelKey == "open_file_channel") {
-        // OpenFile.open(receivedNotification.payload['uri']);
+        OpenFile.open(receivedNotification.payload['uri']);
       } else {
         BlocProvider.of<PaginationBloc>(c).add(PaginationEventMessage());
       }

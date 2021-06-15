@@ -13,7 +13,7 @@ import 'package:sama/UI/Message/Insert/InsertMessage.dart';
 import 'package:sama/UI/Message/MessageListItem.dart';
 import 'package:sama/UI/Message/MessageSearch.dart';
 import 'package:sama/UI/Global/SDrawer.dart';
-import 'package:sama/Utilities/MPref.dart';
+
 import 'package:sama/Utilities/MSnackBar.dart';
 import 'package:sama/Utilities/MTabBNB.dart';
 import 'package:sama/Utilities/SamaAppBar.dart';
@@ -45,7 +45,6 @@ class _MessagePageState extends State<MessagePage> {
   List<Message> data = new List<Message>();
   MessageBloc _messageBloc;
 
-  final _scrollThreshold = 50.0;
   @override
   void initState() {
     super.initState();
@@ -152,10 +151,7 @@ class _MessagePageState extends State<MessagePage> {
                   )),
               body: BlocBuilder<MessageBloc, MessageState>(
                   builder: (context, state) {
-                final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-                    new GlobalKey<RefreshIndicatorState>();
-                return 
-                Column(
+                return Column(
                   children: <Widget>[
                     Container(
                       decoration: BoxDecoration(

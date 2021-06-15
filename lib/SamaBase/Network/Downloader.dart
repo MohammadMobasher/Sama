@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:open_file/open_file.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -87,7 +87,7 @@ class Downloader {
     final obj = jsonDecode(json);
 
     if (obj['isSuccess']) {
-      // OpenFile.open(obj['filePath']);
+      OpenFile.open(obj['filePath']);
     } else {
       showDialog(
         context: this.context1,

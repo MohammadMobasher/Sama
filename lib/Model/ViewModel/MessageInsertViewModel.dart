@@ -4,13 +4,15 @@ class MessageInsertViewModel {
   List<int> recipients;
   List<int> ccRecipients;
   List<int> bccRecipients;
+  String attachPath;
 
   MessageInsertViewModel(
       {this.title,
       this.text,
       this.recipients,
       this.ccRecipients,
-      this.bccRecipients});
+      this.bccRecipients,
+      this.attachPath});
 
   MessageInsertViewModel.fromJson(Map<String, dynamic> json) {
     title = json['title'];

@@ -3,8 +3,9 @@ import 'dart:convert';
 class MessageReplyViewModel {
   int messageId;
   String text;
+  String attachPath;
 
-  MessageReplyViewModel({this.messageId, this.text});
+  MessageReplyViewModel({this.messageId, this.text, this.attachPath});
 
   MessageReplyViewModel.fromJson(Map<String, dynamic> json) {
     text = json['text'];

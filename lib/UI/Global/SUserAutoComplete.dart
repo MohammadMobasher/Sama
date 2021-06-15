@@ -286,7 +286,7 @@ class _SUserAutoCompleteState extends State<SUserAutoComplete> {
         user.fullname + " " + user.lastname,
         //style: Theme.of(context).textTheme.body2,
       ),
-      subtitle: Text(user.lastname),
+      subtitle: Text(getPartPostDeputy(user)),
       onTap: () {
         setState(() {
           this.overlayEntry.remove();
@@ -327,5 +327,17 @@ class _SUserAutoCompleteState extends State<SUserAutoComplete> {
       }
       return childItems;
     }
+  }
+
+  String getPartPostDeputy(User user) {
+    String result = "";
+    if (user.deputy != null) {
+      result += user.deputy.title + "/";
+    }
+    if (user.part != null) result += user.part.title + "/";
+
+    if (user.post != null) result += user.post.title;
+
+    return result;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class MessageReply extends StatefulWidget {
 }
 
 class _messageReplyState extends State<MessageReply> {
+  List<PlatformFile> _files = new List<PlatformFile>();
   final key = new GlobalKey<ScaffoldState>();
   MessageBloc _messageBloc;
 
@@ -108,7 +110,6 @@ class _messageReplyState extends State<MessageReply> {
                   controller: this._textController,
                   minLines: 10,
                   maxLines: 20,
-                  keyboardType: TextInputType.text,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -121,6 +122,44 @@ class _messageReplyState extends State<MessageReply> {
                   ),
                 ),
               ),
+              RaisedButton(
+                onPressed: () async {
+                  FilePickerResult result = await FilePicker.platform.pickFiles(
+                    allowMultiple: false,
+                  );
+                  setState(() {
+                    if (result != null) {
+                      _files = result.files;
+                    } else {
+                      _files = null;
+                    }
+                  });
+                },
+                child: const Icon(Icons.attach_file),
+              ),
+              new ConstrainedBox(
+                  constraints: new BoxConstraints(
+                    minHeight: 30.0,
+                    maxHeight: (_files.length > 1 ? 200.0 : 50),
+                  ),
+                  child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: _files.length,
+                    itemBuilder: (BuildContext ctxt, int index) {
+                      return ListTile(
+                        leading: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(60),
+                          ),
+                          child: Center(child: Text(index.toString())),
+                        ),
+                        title: Text(_files[index].name),
+                      );
+                    },
+                  )),
               Expanded(
                 child: Align(
                     alignment: Alignment.bottomCenter,
@@ -158,7 +197,12 @@ class _messageReplyState extends State<MessageReply> {
 
   void _onPressedSendBtn(BuildContext context) {
     _messageBloc.add(MessageEventReply(
-        vm: new MessageReplyViewModel(text: this._textController.text, messageId: widget.message_id)));
+        vm: new MessageReplyViewModel(
+            text: this._textController.text,
+            messageId: widget.message_id,
+            attachPath: ((this._files != null && this._files.length > 0)
+                ? this._files.first.path
+                : ""))));
 
     Navigator.popUntil(
         context, ModalRoute.withName(Navigator.defaultRouteName));

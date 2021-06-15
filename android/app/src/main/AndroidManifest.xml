@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="sama"
+        android:label="سیما"
         tools:replace="android:label"
         android:icon="@mipmap/launcher_icon">
         <activity

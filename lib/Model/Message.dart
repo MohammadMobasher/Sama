@@ -10,15 +10,29 @@ class Message extends Equatable {
   DateTime date;
   bool isSeen;
   Sender sender;
+  List<Attache> mainAttach;
   String text;
   List<Receiver> receivers;
   List<Attache> attaches;
 
-  Message({this.mailId, this.title, this.date, this.isSeen, this.sender});
+  Message(
+      {this.mailId,
+      this.title,
+      this.date,
+      this.isSeen,
+      this.sender,
+      this.mainAttach});
 
   Message.fromJson(Map<String, dynamic> json) {
     mailId = json['mail_id'];
     title = json['title'];
+    // mainAttach = json["mainAttach"];
+    if (json['mainAttach'] != null) {
+      mainAttach = new List<Attache>();
+      json['mainAttach'].forEach((v) {
+        mainAttach.add(new Attache.fromJson(v));
+      });
+    }
     text = json['text'] != null ? json['text'] : "";
     date = DateTime.parse(json['date'].toString());
     isSeen =

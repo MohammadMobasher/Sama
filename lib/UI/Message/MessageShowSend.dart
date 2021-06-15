@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/flutter_html.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sama/BloC/Message/MessageBloc.dart';
@@ -166,7 +166,7 @@ class _MessageShowSend extends State<MessageShowSend> {
               Container(
                 margin: EdgeInsets.all(8),
                 color: Colors.white,
-                child: Text(state.message.text),
+                child: Html(data: state.message.text),
               ),
               (state.message.attaches != null &&
                       state.message.attaches.length > 0
@@ -242,7 +242,9 @@ class _MessageShowSend extends State<MessageShowSend> {
                                             itemBuilder: (context, index) {
                                               return ListTile(
                                                 leading: Icon(
-                                                    Icons.insert_drive_file),
+                                                  Icons.insert_drive_file,
+                                                  size: 35,
+                                                ),
                                                 title: Align(
                                                   child: new Text(
                                                       state

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class MessageForward extends StatefulWidget {
 
 class _messageForward extends State<MessageForward> {
   final key = new GlobalKey<ScaffoldState>();
+  List<PlatformFile> _files = new List<PlatformFile>();
   MessageBloc _messageBloc;
 
   final _textController = TextEditingController();
@@ -96,7 +98,6 @@ class _messageForward extends State<MessageForward> {
                   controller: this._textController,
                   minLines: 10,
                   maxLines: 20,
-                  keyboardType: TextInputType.text,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -109,6 +110,44 @@ class _messageForward extends State<MessageForward> {
                   ),
                 ),
               ),
+              RaisedButton(
+                onPressed: () async {
+                  FilePickerResult result = await FilePicker.platform.pickFiles(
+                    allowMultiple: false,
+                  );
+                  setState(() {
+                    if (result != null) {
+                      _files = result.files;
+                    } else {
+                      _files = null;
+                    }
+                  });
+                },
+                child: const Icon(Icons.attach_file),
+              ),
+              new ConstrainedBox(
+                  constraints: new BoxConstraints(
+                    minHeight: 30.0,
+                    maxHeight: (_files.length > 1 ? 200.0 : 50),
+                  ),
+                  child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: _files.length,
+                    itemBuilder: (BuildContext ctxt, int index) {
+                      return ListTile(
+                        leading: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(60),
+                          ),
+                          child: Center(child: Text(index.toString())),
+                        ),
+                        title: Text(_files[index].name),
+                      );
+                    },
+                  )),
               Expanded(
                 child: Align(
                   alignment: Alignment.bottomCenter,
@@ -156,7 +195,12 @@ class _messageForward extends State<MessageForward> {
     List<int> recipientIds = this._recipientUsers.map((f) => f.userId).toList();
     _messageBloc.add(MessageEventForward(
         vm: new MessageForwardViewModel(
-            text: this._textController.text, recipients: recipientIds)));
+            messageId: widget.message_id,
+            text: this._textController.text,
+            recipients: recipientIds,
+            attachPath: ((this._files != null && this._files.length > 0)
+                ? this._files.first.path
+                : ""))));
 
     Navigator.popUntil(
         context, ModalRoute.withName(Navigator.defaultRouteName));
